@@ -464,8 +464,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f14094051d3335d68be7660f91d1fb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1
+  speed: 10
   laneSpeed: 10
+  jumpLength: 7.5
+  jumpHeight: 2
 --- !u!1001 &1684546929
 PrefabInstance:
   m_ObjectHideFlags: 0
