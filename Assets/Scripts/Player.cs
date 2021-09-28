@@ -8,19 +8,27 @@ public class Player : MonoBehaviour
     public float laneSpeed;
     public float jumpLength;
     public float jumpHeight;
+    public float slideLength;
 
     private Animator anim;
     private Rigidbody rb;
+    private BoxCollider boxCollider;
     private int currentLane = 1;
     private Vector3 verticalTargetPosition;
     private bool jumping = false;
     private float jumpStart;
+    private bool sliding = false;
+    private float slideStart;
+    private Vector3 boxColliderSize;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponentInChildren<Animator>();
+        boxCollider = GetComponent<BoxCollider>();
+        boxColliderSize = boxCollider.size;
+        anim.Play("runStart");
     }
 
     void Update()
@@ -36,6 +44,10 @@ public class Player : MonoBehaviour
         else if(Input.GetKeyDown(KeyCode.UpArrow))
         {
             Jump();
+        }
+        else if(Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Slider();
         }
 
         if(jumping)
@@ -56,6 +68,17 @@ public class Player : MonoBehaviour
 
         Vector3 targetPosition = new Vector3(verticalTargetPosition.x, verticalTargetPosition.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
+    
+        if(sliding)
+        {
+            float ratio = (transform.position.z - slideStart) / slideLength;
+            if(ratio >= 1f)
+            {
+                sliding = false;
+                anim.SetBool("Sliding", false);
+                boxCollider.size = boxColliderSize;
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -80,6 +103,20 @@ public class Player : MonoBehaviour
             anim.SetFloat("JumpSpeed", speed / jumpLength);
             anim.SetBool("Jumping", true);
             jumping = true;
+        }
+    }
+
+    void Slider()
+    {
+        if(!jumping && !sliding)
+        {
+            slideStart = transform.position.z;
+            anim.SetFloat("JumpSpeed", speed / slideLength);
+            anim.SetBool("Sliding", true);
+            Vector3 newSize = boxCollider.size;
+            newSize.y = newSize.y / 2;
+            boxCollider.size = newSize;
+            sliding = true;  
         }
     }
 };
